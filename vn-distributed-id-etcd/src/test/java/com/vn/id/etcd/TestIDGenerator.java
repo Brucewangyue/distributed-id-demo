@@ -11,7 +11,7 @@ import java.util.concurrent.*;
 public class TestIDGenerator {
 
     private final static String[] address = {"http://10.0.0.30:2379", "http://10.0.0.31:2379", "http://10.0.0.32:2379"};
-    private final static int THREADS = 600;
+    private final static int THREADS = 1;
     private ExecutorService executorService = Executors.newCachedThreadPool();
     private ConcurrentMap<String, Integer> idsMap = new ConcurrentHashMap<>();
 
