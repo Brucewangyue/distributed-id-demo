@@ -8,5 +8,5 @@ public abstract class AbstractIDGenerator {
      * 生成id
      * @return id
      */
-    public abstract String generate();
+    public abstract long generate();
 }

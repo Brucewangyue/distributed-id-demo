@@ -18,14 +18,14 @@ public class TestIDGenerator {
     public void test_generator() throws InterruptedException {
         long start = System.currentTimeMillis();
 
-        ConcurrentMap<String, Integer> idsMap = new ConcurrentHashMap<>();
+        ConcurrentMap<Long, Integer> idsMap = new ConcurrentHashMap<>();
         CountDownLatch countDownLatch = new CountDownLatch(THREADS);
         RedisIncrIDGenerator redisIncrIDGenerator = new RedisIncrIDGenerator();
 
         for (int i = 0; i < THREADS; i++) {
             executorService.execute(() -> {
                 countDownLatch.countDown();
-                String id = redisIncrIDGenerator.generate();
+                long id = redisIncrIDGenerator.generate();
                 idsMap.put(id, 1);
             });
         }

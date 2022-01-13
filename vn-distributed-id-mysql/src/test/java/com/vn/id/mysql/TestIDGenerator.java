@@ -33,7 +33,7 @@ public class TestIDGenerator {
 
     @Test
     public void test_generator_auto_increment_id() throws InterruptedException {
-        ConcurrentMap<String, String> map = new ConcurrentHashMap<>();
+        ConcurrentMap<Long, String> map = new ConcurrentHashMap<>();
         CountDownLatch countDownLatch = new CountDownLatch(THREADS);
         MysqlAutoIncrementIDGenerator idGenerator = new MysqlAutoIncrementIDGenerator(dataSource);
         // 1000个线程同时请求时
@@ -42,7 +42,7 @@ public class TestIDGenerator {
             executorService.execute(() -> {
                 // 阻塞等待所有线程都走到这一步
                 countDownLatch.countDown();
-                String id = idGenerator.generate();
+                long id = idGenerator.generate();
                 map.put(id, "1");
             });
         }
@@ -60,14 +60,14 @@ public class TestIDGenerator {
     public void test_generator_number_segment_id() throws InterruptedException {
         long start = System.currentTimeMillis();
 
-        ConcurrentMap<String, String> map = new ConcurrentHashMap<>();
+        ConcurrentMap<Long, String> map = new ConcurrentHashMap<>();
         CountDownLatch countDownLatch = new CountDownLatch(THREADS);
         MysqlNumberSegmentIDGenerator idGenerator = new MysqlNumberSegmentIDGenerator(dataSource);
         for (int i = 0; i < THREADS; i++) {
             executorService.execute(() -> {
                 // 阻塞等待所有线程都走到这一步
                 countDownLatch.countDown();
-                String id = idGenerator.generate("test");
+                long id = idGenerator.generate("test");
                 map.put(id, "1");
             });
         }
@@ -87,14 +87,14 @@ public class TestIDGenerator {
             executorService.execute(() -> {
 
                 ExecutorService newCachedThreadPool = Executors.newCachedThreadPool();
-                ConcurrentMap<String, String> map = new ConcurrentHashMap<>();
+                ConcurrentMap<Long, String> map = new ConcurrentHashMap<>();
                 CountDownLatch countDownLatch = new CountDownLatch(THREADS);
                 MysqlNumberSegmentIDGenerator idGenerator = new MysqlNumberSegmentIDGenerator(dataSource);
                 for (int j = 0; j < THREADS; j++) {
                     newCachedThreadPool.execute(() -> {
                         // 阻塞等待所有线程都走到这一步
                         countDownLatch.countDown();
-                        String id = idGenerator.generate("test");
+                        long id = idGenerator.generate("test");
                         map.put(id, "1");
                     });
                 }

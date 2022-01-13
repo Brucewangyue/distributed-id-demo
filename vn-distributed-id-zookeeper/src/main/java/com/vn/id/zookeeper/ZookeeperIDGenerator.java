@@ -41,14 +41,13 @@ public class ZookeeperIDGenerator extends AbstractIDGenerator {
     }
 
     @Override
-    public String generate() {
-        return null;
+    public long generate() {
+        return 0;
     }
 
-    public String generate(String bizPath) {
+    public long generate(String bizPath) {
         checkNodeExist(bizPath);
 
-        String id = null;
         try {
             String idPath = zkClient.create().withMode(CreateMode.PERSISTENT_SEQUENTIAL).forPath(ROOT.concat(bizPath).concat(ID_PREFIX_NAME));
             System.out.println("idPath:" + idPath);
@@ -64,20 +63,18 @@ public class ZookeeperIDGenerator extends AbstractIDGenerator {
             });
 
             // 解析id
-            id = splitId(idPath);
+            return splitId(idPath);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return id;
     }
 
-    private String splitId(String idPath) {
+    private long splitId(String idPath) {
         int i = idPath.lastIndexOf(ID_PREFIX_NAME);
         if (i >= 0) {
             i += ID_PREFIX_NAME.length();
-            return idPath.substring(i);
+            return new Long(idPath.substring(i));
         }
 
         throw new RuntimeException("ZookeeperIDGenerator id格式不符合规范");

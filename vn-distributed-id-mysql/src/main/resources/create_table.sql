@@ -11,6 +11,6 @@ create table `segment_id`(
    `max_id` bigint NOT NULL comment '当前最大id',
    `step` bigint NOT NULL comment '号段步长',
    `biz_code` varchar(16) NOT NULL comment '业务类型编码',
-   `version` bigint NOT NULL comment '乐观锁版本',
+   `version` bigint NOT NULL comment '乐观锁版本, 这个字段不是必须的，也可以拿max_id做为乐观锁的判断条件',
    primary key (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='' auto_increment 1

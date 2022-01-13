@@ -13,7 +13,7 @@ public class TestIDGenerator {
     private final static String[] address = {"http://10.0.0.30:2379", "http://10.0.0.31:2379", "http://10.0.0.32:2379"};
     private final static int THREADS = 1;
     private ExecutorService executorService = Executors.newCachedThreadPool();
-    private ConcurrentMap<String, Integer> idsMap = new ConcurrentHashMap<>();
+    private ConcurrentMap<Long, Integer> idsMap = new ConcurrentHashMap<>();
 
     @Test
     public void test_generate_id() throws InterruptedException {
@@ -24,7 +24,7 @@ public class TestIDGenerator {
         for (int i = 0; i < THREADS; i++) {
             executorService.execute(() -> {
                 countDownLatch.countDown();
-                String id = etcdIDGenerator.generate("test");
+                long id = etcdIDGenerator.generate("test");
                 idsMap.put(id, 1);
             });
         }
@@ -49,7 +49,7 @@ public class TestIDGenerator {
             executorService.execute(() -> {
                 countDownLatch.countDown();
                 EtcdIDGenerator etcdIDGenerator = new EtcdIDGenerator(address);
-                String id = etcdIDGenerator.generate("test");
+                long id = etcdIDGenerator.generate("test");
                 idsMap.put(id, 1);
             });
         }

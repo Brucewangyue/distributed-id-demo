@@ -23,11 +23,11 @@ public class EtcdIDGenerator extends AbstractIDGenerator {
     }
 
     @Override
-    public String generate() {
+    public long generate() {
         return generate("default");
     }
 
-    public String generate(String bizCode) {
+    public long generate(String bizCode) {
         if (StringUtil.isNullOrEmpty(bizCode)) {
             throw new RuntimeException("EtcdIDGenerator error: parameter bizCode required");
         }
@@ -39,11 +39,9 @@ public class EtcdIDGenerator extends AbstractIDGenerator {
             PutResponse putResponse = kvClient.put(key, value).get();
             // todo revision 全局唯一，如果是多个业务表都要分布式id，这样取得不到连续的id，并且要公用一个revision的范围
             long revision = putResponse.getHeader().getRevision();
-            return revision + "";
+            return revision;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return null;
     }
 }

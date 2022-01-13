@@ -10,12 +10,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class MysqlNumberSegmentIDGenerator extends AbstractIDGenerator {
 
     DataSource dataSource;
 
-    private long currentId;
+    //    private long currentId;
+    private AtomicLong currentId = new AtomicLong(0);
 
     /**
      * todo 每个bizCode需要自定义step
@@ -34,38 +36,33 @@ public class MysqlNumberSegmentIDGenerator extends AbstractIDGenerator {
     }
 
     @Override
-    public String generate() {
+    public long generate() {
         return generate("");
     }
 
-    public String generate(String bizCode) {
+    public long generate(String bizCode) {
         if (StringUtils.isNullOrEmpty(bizCode)) {
             throw new RuntimeException("MysqlNumberSegmentIDGenerator 缺少bizCode参数");
         }
 
         // 先在缓存取
         Long maxId = maxIdMap.get(bizCode);
-        if (null == maxId || maxId == currentId) {
+        if (null == maxId || maxId == currentId.get()) {
             // 数据库申请号段
             applyIdSegment(bizCode);
         }
 
-        return generatorId();
+        return currentId.getAndIncrement();
     }
-
-    private synchronized String generatorId() {
-        return (++currentId) + "";
-    }
-
     /**
-     * 加锁防止重复申请号段
+     * 加锁防止 同机器多线程 重复申请号段
      *
      * @param bizCode
      * @return
      */
     private synchronized void applyIdSegment(String bizCode) {
         Long maxId = maxIdMap.get(bizCode);
-        if (null != maxId && maxId > currentId) {
+        if (null != maxId && maxId > currentId.get()) {
             return;
         }
 
@@ -100,7 +97,7 @@ public class MysqlNumberSegmentIDGenerator extends AbstractIDGenerator {
                     throw new RuntimeException("MysqlNumberSegmentIDGenerator 新增号段失败 biz_code=" + bizCode);
                 }
 
-                this.currentId = 0;
+                this.currentId.set(0);
                 this.maxIdMap.put(bizCode, this.step);
 
                 return;
@@ -119,9 +116,9 @@ public class MysqlNumberSegmentIDGenerator extends AbstractIDGenerator {
                 // synchronized 支持锁重入
                 applyIdSegment(bizCode);
             } else {
-                this.currentId = rs_maxId;
+                this.currentId.set(rs_maxId);
                 this.maxIdMap.put(bizCode, newMaxId);
-                System.out.println("最终起始id：" + (currentId + 1) + "号段：" + maxIdMap);
+                System.out.println("最终起始id：" + (rs_maxId + 1) + "号段：" + maxIdMap);
             }
         } catch (SQLException e) {
             throw new RuntimeException("MysqlNumberSegmentIDGenerator 更新号段失败 biz_code=" + bizCode, e);

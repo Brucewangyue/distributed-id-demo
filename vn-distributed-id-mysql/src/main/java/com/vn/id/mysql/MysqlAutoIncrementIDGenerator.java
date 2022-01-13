@@ -30,7 +30,7 @@ public class MysqlAutoIncrementIDGenerator extends AbstractIDGenerator {
     }
 
     @Override
-    public String generate() {
+    public long generate() {
         try {
             Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(SQL,Statement.RETURN_GENERATED_KEYS);
@@ -39,7 +39,7 @@ public class MysqlAutoIncrementIDGenerator extends AbstractIDGenerator {
             // 必要，移动指针到数据起始位置
             generatedKeys.next();
             long id = generatedKeys.getLong(1);
-            return id + "";
+            return id;
         } catch (SQLException e) {
             throw new RuntimeException("MysqlAutoIncrementIDGenerator 获取id失败", e);
         }
