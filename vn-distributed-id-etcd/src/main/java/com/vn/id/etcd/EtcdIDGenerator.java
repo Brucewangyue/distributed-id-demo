@@ -9,7 +9,7 @@ import io.netty.util.internal.StringUtil;
 
 /**
  * 利用etcd的全局唯一自增 revision 特性
- * 由于 etcd 是 ca，性能比 redis incr 慢很多，比 mysql auto incr 要快很多
+ * 由于 etcd 是 cp，性能比 redis incr 慢很多，比 mysql auto incr 要快很多
  * 生成6000 id要20秒
  */
 public class EtcdIDGenerator extends AbstractIDGenerator {
